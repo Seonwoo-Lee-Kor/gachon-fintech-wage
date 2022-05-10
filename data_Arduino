@@ -1,0 +1,155 @@
+/* 
+// 공통 애노드인 경우
+int digitNum[10][8] = {
+  {0, 0, 0, 0, 0, 0, 1, 1}, //0
+  {1, 0, 0, 1, 1, 1, 1, 1}, //1
+  {0, 0, 1, 0, 0, 1, 0, 1}, //2
+  {0, 0, 0, 0, 1, 1, 0, 1}, //3
+  {1, 0, 0, 1, 1, 0, 0, 1}, //4
+  {0, 1, 0, 0, 1, 0, 0, 1}, //5
+  {0, 1, 0, 0, 0, 0, 0, 1}, //6
+  {0, 0, 0, 1, 1, 1, 1, 1}, //7
+  {0, 0, 0, 0, 0, 0, 0, 1}, //8
+  {0, 0, 0, 0, 1, 0, 0, 1}  //9
+};
+//사용
+*/
+// 공통 캐소드인 경우
+int segment_led[10][8] = {
+  {1,1,1,1,1,1,0,0}, //0
+  {0,1,1,0,0,0,0,0}, //1
+  {1,1,0,1,1,0,1,0}, //2
+  {1,1,1,1,0,0,1,0}, //3
+  {0,1,1,0,0,1,1,0}, //4
+  {1,0,1,1,0,1,1,0}, //5
+  {1,0,1,1,1,1,1,0}, //6
+  {1,1,1,0,0,0,0,0}, //7
+  {1,1,1,1,1,1,1,0}, //8
+  {1,1,1,1,0,1,1,0}, //9
+};
+//숫자 0~9까지의 값에 대한 LED 출력 상태 배열
+
+void select_segment(int segment_no); //함수 선언
+void segment_off();
+void display_segment(int value);// 함수선언
+void show_digit(int value);
+int value = 0;//value값을 초기값 0으로 선언
+int btn = 13 ;
+int minute = 0;
+int seconds = 0;
+
+unsigned long prev_time = 0; 
+
+void setup(){
+ pinMode(btn,INPUT_PULLUP); // 버튼을 13번 핀에 연결
+  for(int i = 2; i < 9;i++){
+    pinMode(i,OUTPUT); // 2~8핀을 출력으로 설정
+  	digitalWrite(i,LOW); // LED 끄기
+}
+  pinMode(9,OUTPUT); //1번째 세그먼트 선택핀
+  pinMode(10,OUTPUT);//2번째 세그먼트 선택핀
+  pinMode(11,OUTPUT);//3번째 세그먼트 선택핀
+  pinMode(12,OUTPUT);//4번째 세그먼트 선택핀
+ // prev_pressed_millis = millis(); 
+  //마지막으로 버튼을 누른 시간을 현재시각으로 설정
+//  prev_button_stats = digitalRead(13);
+  //버튼의 누름 상태를 저장
+}
+
+
+void loop(){
+   if(digitalRead(13) == HIGH){
+   int value = millis()/1000;
+  	display_segment(value);
+   
+  if(digitalRead(13) == LOW){
+   int value = 0;
+    value = millis()/1000;
+  display_segment(value);
+    delay(2000);
+  //  digitalWrite(9,LOW);
+//   digitalWrite(10,LOW);
+  // digitalWrite(11,LOW);
+  // digitalWrite(12,LOW);
+  
+ //   display_segment(value);
+
+  }
+ }
+}
+  
+  
+void select_segment(int segment_no)
+// 0,1,2,3을 입력 받아 
+// 0일 경우 1번 세그먼트를 켜고 나머지는 끈다
+// 1일 경우 2번 세그먼트를 켜고 나머지는 끈다
+// 2일 경우 3번 세그먼트를 켜고 나머지는 끈다
+// 3일 경우 4번 세그먼트를 켜고 나머지는 끈다
+{
+  if (segment_no == 0){
+    digitalWrite(9,LOW);
+    digitalWrite(10,HIGH);
+    digitalWrite(11,HIGH);
+    digitalWrite(12,HIGH);
+  }
+   if (segment_no == 1){
+    digitalWrite(9,HIGH);
+    digitalWrite(10,LOW);
+    digitalWrite(11,HIGH);
+    digitalWrite(12,HIGH);
+  }
+   if (segment_no == 2){
+    digitalWrite(9,HIGH);
+    digitalWrite(10,HIGH);
+    digitalWrite(11,LOW);
+    digitalWrite(12,HIGH);
+  }
+   if (segment_no == 3){
+    digitalWrite(9,HIGH);
+    digitalWrite(10,HIGH);
+    digitalWrite(11,HIGH);
+    digitalWrite(12,LOW);
+  }
+}
+
+void segment_off() // 모두 끄기
+{
+  digitalWrite(9,HIGH);
+  digitalWrite(10,HIGH);
+  digitalWrite(11,HIGH);
+  digitalWrite(12,HIGH);
+}
+  
+void show_digit(int value) // 세그먼트에 value 숫자를 표시하는 함수
+{
+  for(int i=0;i < 7;i++)
+  {
+    digitalWrite(i+2,segment_led[value][i]);
+  } //i+2번핀에 value값에 해당하는 배열의 내용을 출력
+}
+  
+void display_segment(int value) //value의 값을 세그먼트에 출력
+{
+  int digit1_value = (value/1000)% 10 ;
+  int digit2_value = (value/100)% 10 ;
+  int digit3_value = (value/10)% 10 ;
+  int digit4_value = (value/1)% 10 ;
+  segment_off();
+  show_digit(digit1_value);
+  select_segment(0);
+  delay(10);
+  segment_off();
+  show_digit(digit2_value);
+  select_segment(1);
+  delay(10);
+  segment_off();
+  show_digit(digit3_value);
+  select_segment(2);
+  delay(10);
+  segment_off();
+  show_digit(digit4_value);
+  select_segment(3);
+  delay(10);
+}
+  
+
