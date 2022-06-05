@@ -1,0 +1,23 @@
+import serial
+import pandas as pd
+ard=serial.Serial('COM5',9600)
+s = ""
+ard.inWaiting()
+while ard.inWaiting() > 0 :
+ s += ard.readline().decode()
+ print(s)
+ ard.inWaiting() #대기 중인 값
+ print(s) # log data
+ t = ""
+for x in range(s.count('In')):
+    t +=  s[38+45*x:44+45*x][0:len(s[38+45*x:44+45*x])-4] + " "
+    print(t) # log out data
+    p = t[:-1].split(" ")
+    work_time = pd.DataFrame([p[0],0,0,0,0,0,0],
+                          columns=["1st"],index=['mon','tue','wen','thu','fri','sat','sun'])
+
+work_time['2nd']=(0,0,p[1],0,0,0,0)
+work_time['3rd']=(0,0,0,p[2],0,p[3],0)
+work_time['4th']=(p[4],0,0,p[5],0,0,0)
+work_time['H']=(9500)
+work_time
