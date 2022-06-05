@@ -1,0 +1,112 @@
+import serial
+import pandas as pd
+ard=serial.Serial('COM5',9600)
+s = ""
+ard.inWaiting()
+
+while ard.inWaiting() > 0 :
+    s += ard.readline().decode()
+    print(s)
+
+ard.inWaiting() #대기 중인 값
+print(s)
+w=s.split(" ")
+count = w.count('Out,')
+
+p1=list()
+p2=list()
+p3=list()
+
+for x in range(count) : 
+    if float(w.index('Out,')) > 0 :
+        if w[w.index('Out,')-3][len(w[w.index('Out,')-3])-2:len(w[w.index('Out,')-3])-1]   == '1':
+            if len(w[w.index('Out,')+1]) >7 :
+                p1 += [w[w.index('Out,')+1][:-7]] 
+                w.remove('Out,')
+            else :
+                p1 += [w[w.index('Out,')+1][:-5]]
+                w.remove('Out,')
+        elif w[w.index('Out,')-3][len(w[w.index('Out,')-3])-2:len(w[w.index('Out,')-3])-1]    == '2':
+            if len(w[w.index('Out,')+1]) >7 :
+                p2 += [w[w.index('Out,')+1][:-7] ]
+                w.remove('Out,')
+            else :
+                p2 += [w[w.index('Out,')+1][:-5]]
+                w.remove('Out,')
+        elif w[w.index('Out,')-3][len(w[w.index('Out,')-3])-2:len(w[w.index('Out,')-3])-1]    == '3':
+            if len(w[w.index('Out,')+1]) >7 :
+                p3 += [w[w.index('Out,')+1][:-7]] 
+                w.remove('Out,')
+            else :
+                p3 += [w[w.index('Out,')+1][:-5]]
+                w.remove('Out,')
+        
+                
+
+
+p1 # ID 1 인 사람 data
+p2 # ID 2 인 사람 data
+p3 # ID 3 인 사람 data
+
+# ID 1
+for x in  range(6- len(p1)) :
+    if 6 - len(p1) > 0 :
+        p1 += ['0']
+        
+try :
+    work_time1 = pd.DataFrame([p1[0],0,0,0,0,0,0],
+                          columns=["1st"],index=['mon','tue','wen','thu','fri','sat','sun'])
+
+    work_time1['2nd']=(0,0,p1[1],0,0,0,0)
+    work_time1['3rd']=(0,0,0,p1[2],0,p1[3],0)
+    work_time1['4th']=(p1[4],0,0,p1[5],0,0,0)
+    work_time1['H']=(9500)
+    work_time1
+
+except:
+        print("check Id 1 data")
+
+# ID 2
+for x in  range(6- len(p2)) :
+    if 6 - len(p2) > 0 :
+        p2 += ['0']
+        
+try :
+    work_time2 = pd.DataFrame([0,0,0,p2[0],0,0,0],
+                          columns=["1st"],index=['mon','tue','wen','thu','fri','sat','sun'])
+
+    work_time2['2nd']=(0,0,p2[1],0,0,p2[2],0)
+    work_time2['3rd']=(0,0,0,p2[3],0,p2[4],0)
+    work_time2['4th']=(0,0,0,p2[5],0,0,0)
+    work_time2['H']=(9500)
+    work_time2
+
+except:
+        print("check Id 2 data")
+    
+# ID 3
+for x in  range(6- len(p3)) :
+    if 6 - len(p3) > 0 :
+        p3 += ['0']
+        
+try :
+    work_time3 = pd.DataFrame([0,p3[0],0,0,p3[1],0,0],
+                          columns=["1st"],index=['mon','tue','wen','thu','fri','sat','sun'])
+
+    work_time3['2nd']=(0,0,p3[2],0,0,0,0)
+    work_time3['3rd']=(0,0,0,p3[3],p3[4],0,0)
+    work_time3['4th']=(0,0,0,p3[5],0,0,0)
+    work_time3['H']=(9500)
+    work_time3
+
+except:
+        print("check Id 3 data")
+
+print(s)
+print(work_time1)
+print(work_time2)
+print(work_time3)
+
+work_time1.to_pickle("work_time1.pkl")
+work_time2.to_pickle("work_time2.pkl")
+work_time3.to_pickle("work_time3.pkl")
