@@ -1,39 +1,47 @@
-import serial
+#아두이노 데이터 산출
+import serial   
 import pandas as pd
-ard=serial.Serial('COM5',9600)
+ard=serial.Serial('COM5',9600) #아두니오와 파이썬 연결
 s = ""
-ard.inWaiting()
+ard.inWaiting()  # 현재 아두이노에서 불러올 수 있는 값 확인
 
 while ard.inWaiting() > 0 :
     s += ard.readline().decode()
-    print(s)
+    print(s)   # 산출된 데이터
 
-ard.inWaiting() #대기 중인 값
+    # 시간은 밀리초로 나오기때문에 0.000초로 나옵니다.
+
+ard.inWaiting() #대기 중인 값 재확인
 print(s)
-w=s.split(" ")
-count = w.count('Out,')
+w=s.split(" ") 
+count = w.count('Out,') # Out한 개수
 
-p1=list()
+# 3명의 데이터
+p1=list() 
 p2=list()
 p3=list()
 
+
+
 for x in range(count) : 
     if float(w.index('Out,')) > 0 :
-        if w[w.index('Out,')-3][len(w[w.index('Out,')-3])-2:len(w[w.index('Out,')-3])-1]   == '1':
-            if len(w[w.index('Out,')+1]) >7 :
-                p1 += [w[w.index('Out,')+1][:-7]] 
-                w.remove('Out,')
+        if w[w.index('Out,')-3][len(w[w.index('Out,')-3])-2:len(w[w.index('Out,')-3])-1]   == '1':  # ID가 1일때
+            if len(w[w.index('Out,')+1]) >7 : # 시간자리가 7개 초과일때 (이유는 시간데이터 뒤에 \r\n 띄어쓰기도 포함되어 있습니다.)
+                p1 += [w[w.index('Out,')+1][:-7]]   # 시간데이터를 p1이라는 변수에 모으는 과정
+                w.remove('Out,')                    # 모은 데이터를 제거하여 중복 방지 
             else :
-                p1 += [w[w.index('Out,')+1][:-5]]
+                p1 += [w[w.index('Out,')+1][:-5]]   # 시간자리가 5개 초과일때
                 w.remove('Out,')
-        elif w[w.index('Out,')-3][len(w[w.index('Out,')-3])-2:len(w[w.index('Out,')-3])-1]    == '2':
-            if len(w[w.index('Out,')+1]) >7 :
+      
+        elif w[w.index('Out,')-3][len(w[w.index('Out,')-3])-2:len(w[w.index('Out,')-3])-1]    == '2':  # ID가 2일때
+            if len(w[w.index('Out,')+1]) >7 :     
                 p2 += [w[w.index('Out,')+1][:-7] ]
                 w.remove('Out,')
             else :
                 p2 += [w[w.index('Out,')+1][:-5]]
                 w.remove('Out,')
-        elif w[w.index('Out,')-3][len(w[w.index('Out,')-3])-2:len(w[w.index('Out,')-3])-1]    == '3':
+      
+        elif w[w.index('Out,')-3][len(w[w.index('Out,')-3])-2:len(w[w.index('Out,')-3])-1]    == '3':  # ID가 3일때
             if len(w[w.index('Out,')+1]) >7 :
                 p3 += [w[w.index('Out,')+1][:-7]] 
                 w.remove('Out,')
@@ -44,12 +52,30 @@ for x in range(count) :
                 
 
 
-p1 # ID 1 인 사람 data
-p2 # ID 2 인 사람 data
-p3 # ID 3 인 사람 data
+ # ID 1 인 사람 시간 data = p1
+ # ID 2 인 사람 시간 data = p2
+ # ID 3 인 사람 시간 data = p3
+
+# 가정
+# 현재 저희 코딩에서는 한달에 6번 일하도록 되어 있습니다.
+# 이유는 한달이라는 데이터를 모으기 위해서는 한달이라는 시간이 필요했고 
+# 저희는 계산식이 제대로 되는지 보여주기 위해 40시간 이상인경우 , 15시간이상 ~ 40시간미만인 경우, 15시간 미만인 경우가 필요합니다.
+# 하여 초단위로 보여드리기 위해서는 6번이라는 한정된 횟수로 할 수 밖에 없었습니다.
+
+#주 5일 일한다면 다음과 같이 데이터를 산출 할수 있습니다.
+# work_time = pd.DataFrame([p[0],p[1],p[2],p[3],p[4],0,0],
+#                          columns=["1st"],index=['mon','tue','wen','thu','fri','sat','sun'])
+#
+#    work_time['2nd']=(p[5],p[6],p[7],p[8],p[9],0,0)
+#    work_time['3rd']=(p[10],p[11],p[12],p[13],p[14],0,0)
+#    work_time['4th']=(p[15],p[16],p[17],p[18],p[19],0,0)
+#    work_time['H']=(9500)
+#    work_time
+ 
+
 
 # ID 1
-for x in  range(6- len(p1)) :
+for x in  range(6- len(p1)) :  # 6번미만으로 일했을 경우 나머지는 0으로 채워집니다.
     if 6 - len(p1) > 0 :
         p1 += ['0']
         
@@ -61,10 +87,10 @@ try :
     work_time1['3rd']=(0,0,0,p1[2],0,p1[3],0)
     work_time1['4th']=(p1[4],0,0,p1[5],0,0,0)
     work_time1['H']=(9500)
-    work_time1
+    work_time1 # ID 1 인 사람의 한달 데이터
 
 except:
-        print("check Id 1 data")
+        print("check Id 1 data")   
 
 # ID 2
 for x in  range(6- len(p2)) :
@@ -79,7 +105,7 @@ try :
     work_time2['3rd']=(0,0,0,p2[3],0,p2[4],0)
     work_time2['4th']=(0,0,0,p2[5],0,0,0)
     work_time2['H']=(9500)
-    work_time2
+    work_time2 # ID 2 인 사람의 한달 데이터
 
 except:
         print("check Id 2 data")
@@ -97,18 +123,12 @@ try :
     work_time3['3rd']=(0,0,0,p3[3],p3[4],0,0)
     work_time3['4th']=(0,0,0,p3[5],0,0,0)
     work_time3['H']=(9500)
-    work_time3
+    work_time3 # ID 3 인 사람의 한달 데이터
 
 except:
         print("check Id 3 data")
 
-print(s)
-print(work_time1)
-print(work_time2)
-print(work_time3)
-
+# 데이트프레임 저장
 work_time1.to_pickle("work_time1.pkl")
 work_time2.to_pickle("work_time2.pkl")
 work_time3.to_pickle("work_time3.pkl")
-
-

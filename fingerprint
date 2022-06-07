@@ -1,3 +1,6 @@
+# 아두이노 코딩 
+# 지문 data 산출
+
 #include <Wire.h>
 #include <hd44780.h>
 #include <hd44780ioClass/hd44780_I2Cexp.h>
@@ -5,37 +8,37 @@
 #include <LiquidCrystal_I2C.h>
 
 #if (defined(__AVR__) || defined(ESP8266)) && !defined(__AVR_ATmega2560__)
-SoftwareSerial mySerial(2, 3);
+SoftwareSerial mySerial(2, 3); 
 #else
 #define mySerial Serial1
 #endif
 
 
-hd44780_I2Cexp lcd(0x27,16,2); //lcd 객체 선언
-Adafruit_Fingerprint finger = Adafruit_Fingerprint(&mySerial);
-String nameArr[3] = {"Ella", "Liam", "James"};
-int logArr[3] = {0, 0, 0};
+hd44780_I2Cexp lcd(0x27,16,2); // lcd 객체 선언
+Adafruit_Fingerprint finger = Adafruit_Fingerprint(&mySerial); 
+String nameArr[3] = {"Ella", "Liam", "James"}; // 이름 설정
+int logArr[3] = {0, 0, 0};   // log in/out 
 
 extern volatile unsigned long timer0_millis;
-unsigned long start = 0;
-unsigned long end = 0;
+unsigned long start = 0;  // 시작 시간
+unsigned long end = 0;    // 종료 시간
 
 void setup()
 {
-  //시리얼 통신 시작
+  // 시리얼 통신 시작
   Serial.begin(9600);
-  //lcd 통신 시작
+  // lcd 통신 시작
   lcd.begin(16, 2);
 
-  //출력될 라벨(타이틀) 출력
-  Serial.println(" ID, NAME, LOG, TIME");
+  // 출력될 라벨(타이틀) 출력
+  Serial.println("ID, NAME, LOG, TIME");
   
-  while (!Serial);  // For Yun/Leo/Micro/Zero/...
+  while (!Serial);  
   delay(100);
   //Serial.println("\n\nAdafruit finger detect test");
 
   // set the data rate for the sensor serial port
-  //지문인식 센서 통신 시작
+  // 지문인식 센서 통신 시작
   finger.begin(57600);
   delay(5);
   //지문인식 센서 디바이스 연결 확인
@@ -47,7 +50,8 @@ void setup()
   }
 
   //Serial.println(F("Reading sensor parameters"));
-  //지문인식 센서 정보 확인
+
+//지문인식 센서 정보 확인
   finger.getParameters();
 //  Serial.print(F("Status: 0x")); Serial.println(finger.status_reg, HEX);
 //  Serial.print(F("Sys ID: 0x")); Serial.println(finger.system_id, HEX);
@@ -71,19 +75,20 @@ void setup()
 
 void loop()                     // run over and over again
 {
-  unsigned long end = millis();
-  getFingerprintID();
-  delay(50);            //don't ned to run this at full speed.
+  unsigned long end = millis(); // 밀리초로 종료시간 설정
+  getFingerprintID();   
+  delay(50);            
 }
-
+//lcd 설정
 uint8_t getFingerprintID() {
-  uint8_t p = finger.getImage();
-  lcd.clear();
+  uint8_t p = finger.getImage();  
+  lcd.clear();   
   lcd.setCursor(0,0);
   lcd.print("Put your finger");
   lcd.setCursor(0, 1);
   lcd.print("on the sensor!");
   delay(3000);
+  // 오류시 발생 lcd 화면
   switch (p) {
     case FINGERPRINT_OK:
       //Serial.println("Image taken");
@@ -104,6 +109,7 @@ uint8_t getFingerprintID() {
 
   // OK success!
 
+// 오류시 발생 lcd 화면
   p = finger.image2Tz();
   switch (p) {
     case FINGERPRINT_OK:
@@ -141,22 +147,24 @@ uint8_t getFingerprintID() {
     return p;
   }
 
-  // found a match!
+
+ // found a match!
+// lcd 출력
   lcd.clear();
   lcd.setCursor(0,0);
   lcd.print("#");
-  lcd.print(finger.fingerID);
+  lcd.print(finger.fingerID);  // ID
   lcd.print(" ");
-  lcd.print(nameArr[finger.fingerID - 1]);
+  lcd.print(nameArr[finger.fingerID - 1]); // 이름
   lcd.print(" ");
   
-  
-  //Serial.print("DATA, TIME, ");
-  Serial.print(finger.fingerID);
+// 시리얼 모니터 출력
+  Serial.print(finger.fingerID);  
   Serial.print(", ");
   Serial.print(nameArr[finger.fingerID - 1]);
   Serial.print(", ");
 
+// log in/out 설정
   if(logArr[finger.fingerID - 1] == 0){
     logArr[finger.fingerID - 1] = 1;
     Serial.print("Log In");
@@ -177,26 +185,7 @@ uint8_t getFingerprintID() {
     lcd.print("See you again!"); // 두번째 찍을 때
   }
   delay(2000);
-//  Serial.print("Found ID #"); Serial.print(finger.fingerID);
-//  Serial.print(" with confidence of "); Serial.println(finger.confidence);
+
 
   return finger.fingerID;
 }
-
-// returns -1 if failed, otherwise returns ID #
-// 지문 인식 실패시 -1 반환, 다른 경우라면 ID 리턴
-//int getFingerprintIDez() {
-//  uint8_t p = finger.getImage();
-//  if (p != FINGERPRINT_OK)  return -1;
-//
-//  p = finger.image2Tz();
-//  if (p != FINGERPRINT_OK)  return -1;
-//
-//  p = finger.fingerFastSearch();
-//  if (p != FINGERPRINT_OK)  return -1;
-//
-//  // found a match!
-//  Serial.print("Found ID #"); Serial.print(finger.fingerID);
-//  Serial.print(" with confidence of "); Serial.println(finger.confidence);
-//  return finger.fingerID;
-//}

@@ -6,7 +6,7 @@ ard.inWaiting()
 while ard.inWaiting() > 0 :
  s += ard.readline().decode()
  print(s)
- ard.inWaiting() #대기 중인 값
+ ard.inWaiting() # 대기 중인 값
  print(s) # log data
  s.count('In')
  len(s[60+45:65+45])-3

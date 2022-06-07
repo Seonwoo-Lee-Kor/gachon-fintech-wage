@@ -2,7 +2,11 @@ import pandas as pd
 person1 = pd.read_pickle("work_time1.pkl")
 person2 = pd.read_pickle("work_time2.pkl")
 person3 = pd.read_pickle("work_time3.pkl")
-person1
-person2
-person3
+
+
+print(person1)
+print(person2)
+print(person3)
+
+
 
