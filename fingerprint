@@ -10,6 +10,7 @@ SoftwareSerial mySerial(2, 3);
 #define mySerial Serial1
 #endif
 
+
 hd44780_I2Cexp lcd(0x27,16,2); //lcd 객체 선언
 Adafruit_Fingerprint finger = Adafruit_Fingerprint(&mySerial);
 String nameArr[3] = {"Ella", "Liam", "James"};
