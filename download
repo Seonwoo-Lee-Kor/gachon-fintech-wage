@@ -1,4 +1,5 @@
 import pandas as pd
+# 저장된 시간데이터프레임을 불러오는 코드입니다.
 person1 = pd.read_pickle("work_time1.pkl")
 person2 = pd.read_pickle("work_time2.pkl")
 person3 = pd.read_pickle("work_time3.pkl")

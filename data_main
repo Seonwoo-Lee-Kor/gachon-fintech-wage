@@ -7,30 +7,30 @@ ard.inWaiting()  # 현재 아두이노에서 불러올 수 있는 값 확인
 
 while ard.inWaiting() > 0 :
     s += ard.readline().decode()
-    print(s)   # 산출된 데이터
+
+print(s)   # 산출된 데이터
 
     # 시간은 밀리초로 나오기때문에 0.000초로 나옵니다.
 
 ard.inWaiting() #대기 중인 값 재확인
-print(s)
-w=s.split(" ") 
-count = w.count('Out,') # Out한 개수
+w=s.split(" ") #산출된 데이터 가공작업
+count = w.count('Out,') # Out을 기준으로 하기 위해 먼저 Out한 개수 파악
 
 # 3명의 데이터
-p1=list() 
+p1=list()
 p2=list()
 p3=list()
 
 
 
 for x in range(count) : 
-    if float(w.index('Out,')) > 0 :
+    if float(w.index('Out,')) > 0 : # Out한 데이터가 있다면
         if w[w.index('Out,')-3][len(w[w.index('Out,')-3])-2:len(w[w.index('Out,')-3])-1]   == '1':  # ID가 1일때
             if len(w[w.index('Out,')+1]) >7 : # 시간자리가 7개 초과일때 (이유는 시간데이터 뒤에 \r\n 띄어쓰기도 포함되어 있습니다.)
-                p1 += [w[w.index('Out,')+1][:-7]]   # 시간데이터를 p1이라는 변수에 모으는 과정
+                p1 += [w[w.index('Out,')+1][:-7]]   # Out한 시간데이터를 p1이라는 변수에 모으는 과정
                 w.remove('Out,')                    # 모은 데이터를 제거하여 중복 방지 
             else :
-                p1 += [w[w.index('Out,')+1][:-5]]   # 시간자리가 5개 초과일때
+                p1 += [w[w.index('Out,')+1][:-5]]   # 시간자리가 5개 초과일때(마지막에 Out한 시간데이터는 띄어쓰기가 없기 때문입니다.)
                 w.remove('Out,')
       
         elif w[w.index('Out,')-3][len(w[w.index('Out,')-3])-2:len(w[w.index('Out,')-3])-1]    == '2':  # ID가 2일때
@@ -49,7 +49,7 @@ for x in range(count) :
                 p3 += [w[w.index('Out,')+1][:-5]]
                 w.remove('Out,')
         
-                
+
 
 
  # ID 1 인 사람 시간 data = p1
@@ -72,7 +72,8 @@ for x in range(count) :
 #    work_time['H']=(9500)
 #    work_time
  
-
+# 개인별로 모은 시간데이터를 이용하여 데이터프레임으로 변환하는 작업코드입니다.
+# 핵심은 Out한 시간을 기준으로 가동되고 아직 Out하지 않았다면 0으로 산출됩니다.
 
 # ID 1
 for x in  range(6- len(p1)) :  # 6번미만으로 일했을 경우 나머지는 0으로 채워집니다.
@@ -80,7 +81,7 @@ for x in  range(6- len(p1)) :  # 6번미만으로 일했을 경우 나머지는 
         p1 += ['0']
         
 try :
-    work_time1 = pd.DataFrame([p1[0],0,0,0,0,0,0],
+    work_time1 = pd.DataFrame([p1[0],0,0,0,0,0,0], 
                           columns=["1st"],index=['mon','tue','wen','thu','fri','sat','sun'])
 
     work_time1['2nd']=(0,0,p1[1],0,0,0,0)
