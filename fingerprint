@@ -168,6 +168,7 @@ uint8_t getFingerprintID() {
   if(logArr[finger.fingerID - 1] == 0){
     logArr[finger.fingerID - 1] = 1;
     Serial.print("Log In");
+    timer0_millis=0;
     Serial.print(", ");
     Serial.println(start);
     lcd.print("Log In");
