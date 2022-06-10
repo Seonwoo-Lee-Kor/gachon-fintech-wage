@@ -6,7 +6,7 @@ s = ""
 ard.inWaiting()  # 현재 아두이노에서 불러올 수 있는 값 확인
 
 while ard.inWaiting() > 0 :
-    s += ard.readline().decode()
+    s += ard.readline().decode() #복호화를 통해 bytes -> str으로 바꿔줍니다.
 
 print(s)   # 산출된 데이터
 
